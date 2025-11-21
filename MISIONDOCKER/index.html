@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Contenedor Starfleet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#05060a;
+      --panel:#081024;
+      --accent:#59d0ff;
+      --accent-2:#8b5cff;
+      --metal:#b6c1cf;
+      --glass:rgba(255,255,255,0.03);
+    }
+    /* Reset */
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Roboto,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+
+    body{
+      background:radial-gradient(ellipse at center, rgba(255,255,255,0.02) 0%, transparent 25%),
+                 linear-gradient(180deg,#020305 0%, #060812 60%);
+      color:#dbeafe;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* Starfield */
+    .stars{
+      position:fixed;inset:0;pointer-events:none;z-index:0;
+      background-image:radial-gradient(#fff 0.8px, transparent 0.8px), radial-gradient(#fff 0.6px, transparent 0.6px);
+      background-size: 120px 120px, 60px 60px;
+      opacity:0.05;
+      transform:translateZ(0);
+      mix-blend-mode:screen;
+    }
+
+    /* Container */
+    .starfleet-container{
+      position:relative;
+      z-index:1;
+      width:min(960px,92vw);
+      border-radius:20px;
+      padding:28px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 8px 30px rgba(2,6,23,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.04);
+      display:grid;
+      grid-template-columns: 160px 1fr;
+      gap:20px;
+      align-items:center;
+      overflow:hidden;
+      backdrop-filter: blur(6px) saturate(110%);
+    }
+
+    /* Left badge panel */
+    .insignia-panel{
+      display:flex;flex-direction:column;align-items:center;gap:18px;padding:12px;border-radius:12px;
+      background:linear-gradient(180deg, rgba(89,208,255,0.06), rgba(139,92,255,0.03));
+      border:1px solid rgba(255,255,255,0.03);
+      height:100%;min-height:160px;
+    }
+
+    .delta{
+      width:96px;height:110px;display:flex;align-items:center;justify-content:center;position:relative;
+      transform:rotate(-8deg) translateY(-4px);
+    }
+
+    /* Delta icon (stylized, generic) */
+    .delta svg{filter:drop-shadow(0 6px 12px rgba(0,0,0,0.6));}
+    .rank-bar{
+      width:68px;height:8px;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      box-shadow:0 4px 10px rgba(91,150,255,0.12), inset 0 -2px 6px rgba(255,255,255,0.06);
+    }
+
+    /* Right content */
+    .content{
+      padding:6px 2px;display:flex;flex-direction:column;gap:12px;
+    }
+
+    h1{font-family:Orbitron,Roboto, sans-serif;margin:0;font-size:1.6rem;letter-spacing:1px;color:var(--metal);}
+    p.lead{margin:0;color:rgba(220,235,255,0.85);font-size:0.95rem}
+
+    .meta{display:flex;gap:12px;align-items:center;margin-top:6px}
+    .chip{padding:6px 10px;border-radius:999px;background:var(--glass);border:1px solid rgba(255,255,255,0.02);font-size:0.85rem}
+
+    /* Panel box */
+    .panel{
+      margin-top:6px;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.06));
+      border:1px solid rgba(255,255,255,0.03);
+      display:flex;gap:12px;align-items:center;
+    }
+
+    .panel .stat{flex:1}
+    .stat .num{font-family:Orbitron, monospace;font-size:1.25rem}
+    .stat .label{font-size:0.75rem;color:rgba(200,215,255,0.6)}
+
+    /* Buttons */
+    .actions{display:flex;gap:10px;margin-top:12px}
+    .btn{padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:linear-gradient(180deg, rgba(89,208,255,0.08), rgba(139,92,255,0.06));cursor:pointer;backdrop-filter:blur(4px);font-weight:600}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04)}
+
+    /* Responsive */
+    @media (max-width:720px){
+      .starfleet-container{grid-template-columns:1fr;gap:12px;padding:18px}
+      .insignia-panel{flex-direction:row;height:auto;width:100%;justify-content:flex-start}
+      .delta{transform:none}
+    }
+
+    /* Small shimmer */
+    .shine{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.02));transform:translateX(-110%);animation:shimmer 8s linear infinite}
+    @keyframes shimmer{to{transform:translateX(110%)}}
+
+  </style>
+</head>
+<body>
+  <div class="stars" aria-hidden="true"></div>
+
+  <div class="starfleet-container" role="region" aria-label="Contenedor estilo Starfleet">
+
+    <div class="insignia-panel">
+      <div class="delta" aria-hidden="true">
+        <!-- Delta insignia: simple, original shape (no trademark logos) -->
+        <svg viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="1">
+              <stop offset="0" stop-color="#59d0ff" stop-opacity="1"/>
+              <stop offset="1" stop-color="#8b5cff" stop-opacity="1"/>
+            </linearGradient>
+          </defs>
+          <path d="M32 2 L6 70 L32 58 L58 70 Z" fill="url(#g1)" stroke="#0b2130" stroke-width="2"/>
+          <path d="M32 14 L20 62 L32 56 L44 62 Z" fill="rgba(2,6,12,0.12)"/>
+        </svg>
+      </div>
+
+      <div class="rank-bar" aria-hidden="true"></div>
+
+      <div style="font-size:0.78rem;color:rgba(200,215,255,0.75);text-align:center;">Starfleet<br/>Command</div>
+    </div>
+
+    <div class="content">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <div>
+          <h1>Contenedor Starfleet</h1>
+          <p class="lead">Un componente visual inspirado en la estética futurista: paneles limpios, brillos sutiles y una insignia delta estilizada.</p>
+
+          <div class="meta">
+            <div class="chip">Registro: NCC-1701</div>
+            <div class="chip">Sector: 001</div>
+          </div>
+        </div>
+
+        <div style="min-width:140px;text-align:right">
+          <div style="font-size:0.8rem;color:rgba(200,215,255,0.6)">Estado</div>
+          <div style="font-weight:700;font-family:Orbitron,monospace;font-size:1.1rem">EN LÍNEA</div>
+        </div>
+      </div>
+
+      <div class="panel" role="group" aria-label="Indicadores">
+        <div class="stat">
+          <div class="num">Warp 5.2</div>
+          <div class="label">Velocidad</div>
+        </div>
+        <div class="stat">
+          <div class="num">Escudo 86%</div>
+          <div class="label">Integridad</div>
+        </div>
+        <div class="stat">
+          <div class="num">Tripulación 430</div>
+          <div class="label">Personas a bordo</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn">Panel de control</button>
+        <button class="btn ghost">Telemetría</button>
+        <button class="btn ghost">Logs</button>
+      </div>
+
+      <div style="margin-top:8px;font-size:0.8rem;color:rgba(200,215,255,0.55)">Puedes copiar este HTML directamente a tu proyecto o pedirme que lo convierta a un componente React / Tailwind / SASS.</div>
+    </div>
+
+    <div class="shine" aria-hidden="true"></div>
+  </div>
+
+</body>
+</html>
