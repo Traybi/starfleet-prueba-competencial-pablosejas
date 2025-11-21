@@ -1,0 +1,7 @@
+[user]
+	email = traybi10@gmail.com
+	name = Traybi
+	mail = Traybi
+[safe]
+	directory = /var/www/html
+	directory = /home/Archivos/

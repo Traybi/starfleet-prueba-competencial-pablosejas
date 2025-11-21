@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Panel de Diagnóstico de Ingeniería</title>
+<style>
+  body { font-family: 'Arial', sans-serif; background: #000; color: #fff; margin: 0; padding: 20px; }
+  h1 { color: #ff9900; text-align: center; margin-bottom: 20px; }
+  #panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+  .panel { background: #222; border: 4px solid #ff9900; border-radius: 8px; padding: 15px; position: relative; min-height: 100px; }
+  .panel .lcars-corner { width: 40px; height: 40px; background: #ff9900; border-radius: 0 0 40px 0; position: absolute; top: -4px; left: -4px; }
+  .panel .title { font-weight: bold; font-size: 1.1em; margin-bottom: 5px; }
+  .panel .value { font-size: 1.5em; margin-bottom: 5px; }
+  .panel .meta { font-size: 0.8em; color: #ccc; }
+  .status-up { color: #0f0; font-weight: bold; }
+  .status-down { color: #f00; font-weight: bold; }
+  .chip { background: #444; padding: 2px 6px; border-radius: 4px; }
+  #console { margin-top: 20px; font-family: monospace; font-size: 0.9em; }
+  #lastUpdated { margin-top: 5px; font-size: 0.8em; color: #888; }
+</style>
+</head>
+<body>
+
+<h1>Panel de Diagnóstico de Ingeniería</h1>
+
+<div id="panels"></div>
+<div id="console"></div>
+<div id="lastUpdated"></div>
+
+<script>
+const JSON_PATH = 'diagnosticoLCAR.json';
+const REFRESH_MS = 15000;
+
+function createPanel(title, value, metaHtml = '', statusClass='') {
+  const container = document.createElement('div');
+  container.className = 'panel ' + statusClass;
+  container.tabIndex = 0;
+  container.innerHTML = `
+    <div class="lcars-corner"></div>
+    <div class="title">${title}</div>
+    <div class="value">${value}</div>
+    <div class="meta">${metaHtml}</div>
+  `;
+  return container;
+}
+
+function formatStatus(s) {
+  const low = String(s || '').toLowerCase();
+  if(low === 'running' || low === 'active' || low === 'up' || low === 'ok') return '<span class="status-up" role="status">ACTIVO</span>';
+  return '<span class="status-down" role="status">INACTIVO</span>';
+}
+
+async function fetchAndRender() {
+  const consoleEl = document.getElementById('console');
+  try {
+    const res = await fetch(JSON_PATH + '?_=' + Date.now(), { cache: 'no-store' });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    const panels = document.getElementById('panels');
+    panels.innerHTML = '';
+
+    panels.appendChild(createPanel('Apache', data.apache_status || 'desconocido', formatStatus(data.apache_status)));
+    panels.appendChild(createPanel('MySQL', data.mysql_status || 'desconocido', formatStatus(data.mysql_status)));
+    panels.appendChild(createPanel('PHP', data.php_version || 'desconocido', `<span class="chip">v${data.php_version || '—'}</span>`));
+    panels.appendChild(createPanel('Docker', data.docker_version || 'no instalado', `<span class="chip">v${data.docker_version || '—'}</span>`));
+    panels.appendChild(createPanel('Kernel', data.kernel_version || '—', `<div class="meta">Versión instalada</div>`));
+    panels.appendChild(createPanel('Uptime', data.uptime || '—', `<div class="meta">Tiempo activo del servidor</div>`));
+
+    consoleEl.textContent = `Apache=${data.apache_status || 'N/A'} | MySQL=${data.mysql_status || 'N/A'} | PHP=${data.php_version || 'N/A'} | Docker=${data.docker_version || 'N/A'} | Kernel=${data.kernel_version || 'N/A'} | Uptime=${data.uptime || 'N/A'}`;
+    document.getElementById('lastUpdated').textContent = 'Última actualización: ' + new Date().toLocaleString();
+
+  } catch(err) {
+    consoleEl.textContent = 'Error al leer ' + JSON_PATH + ': ' + err.message;
+    document.getElementById('lastUpdated').textContent = '—';
+  }
+}
+
+fetchAndRender();
+setInterval(fetchAndRender, REFRESH_MS);
+</script>
+
+</body>
+</html>
